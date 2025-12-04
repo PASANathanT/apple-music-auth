@@ -9,6 +9,8 @@
   <h2>Apple Music Authorization</h2>
   <button id="authorizeBtn">Authorize</button>
 <script>
+console.log('MusicKit:', window.MusicKit);
+  
   window.onload = function() {
     if (typeof MusicKit === 'object') {
       MusicKit.configure({
