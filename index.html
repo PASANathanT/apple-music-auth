@@ -8,7 +8,33 @@
 <body>
   <h2>Apple Music Authorization</h2>
   <button id="authorizeBtn">Authorize</button>
-  <script>
+<script>
+  window.onload = function() {
+    if (typeof MusicKit === 'object') {
+      MusicKit.configure({
+        developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY0OTE5MzIzLCJpYXQiOjE3NjQ4MzI5MjN9.TO5fOhkYu87wLcfH0SAFHzUBmiXDOhgqEgYFPsUK9fqIfZcWjjl86ixbhod-ryCDywdg9aUH90fN5Z7rDLOB3A',         // <-- Replace with dynamic value from backend!
+        app: {
+          name: 'com.pasa.mediaplayer',
+          build: '1.0'
+        }
+      });
+      const music = MusicKit.getInstance();
+
+      document.getElementById('authorizeBtn').onclick = function() {
+        music.authorize().then(function(userToken) {
+          alert('User Token: ' + userToken);
+        }).catch(function(err) {
+          alert('Authorization failed: ' + err);
+        });
+      };
+    } else {
+      alert('MusicKit JS not loaded.');
+    }
+  };
+</script>
+
+  
+  <!-- <script>
     // Step 1: Wait until MusicKit JS is loaded
     document.addEventListener('musickitloaded', function() {
       console.log('MusicKit loaded!');
@@ -37,6 +63,8 @@
         });
       };
     });
-  </script>
+  </script> -->
+
+  
 </body>
 </html>
