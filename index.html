@@ -8,6 +8,37 @@
   <h2>Apple Music Authorization</h2>
   <button id="authorizeBtn">Authorize</button>
   <script>
+    // Wait for MusicKit to be loaded
+    document.addEventListener('musickitloaded', function() {
+      MusicKit.configure({
+        developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY0OTE5MzIzLCJpYXQiOjE3NjQ4MzI5MjN9.TO5fOhkYu87wLcfH0SAFHzUBmiXDOhgqEgYFPsUK9fqIfZcWjjl86ixbhod-ryCDywdg9aUH90fN5Z7rDLOB3A',
+        app: { name: 'com.pasa.mediaplayer', build: '1.0' }
+      });
+      const music = MusicKit.getInstance();
+      // Attach click handler here, AFTER initialization
+      document.getElementById('authorizeBtn').onclick = function() {
+        music.authorize().then(function(userToken) {
+          alert('User Token: ' + userToken);
+        }).catch(function(err) {
+          alert('Authorization failed: ' + err);
+        });
+      };
+    });
+  </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Apple Music Token Auth</title>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+</head>
+<body>
+  <h2>Apple Music Authorization</h2>
+  <button id="authorizeBtn">Authorize</button>
+  <script>
     let music; // declare this outside functions to make it accessible
 
     // Wait a bit for MusicKit JS to load
@@ -39,4 +70,4 @@
     };
   </script>
 </body>
-</html>
+</html> -->
