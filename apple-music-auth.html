@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Apple Music Token Auth</title>
+  <!-- Load MusicKit JS -->
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+</head>
+<body>
+  <h2>Apple Music Authorization</h2>
+  <button id="authorizeBtn">Authorize</button>
+  <script>
+    // Step 1: Wait until MusicKit JS is loaded
+    document.addEventListener('musickitloaded', function() {
+      // Step 2: Configure MusicKit with your developer token.
+      MusicKit.configure({
+        developerToken: 'YOUR_DEVELOPER_TOKEN',         // <-- Replace with dynamic value from backend!
+        app: {
+          name: 'YourAppName',
+          build: '1.0'
+        }
+      });
+      const music = MusicKit.getInstance();
+
+      // Step 3: Add click handler to trigger authorization on button press
+      document.getElementById('authorizeBtn').onclick = function() {
+        music.authorize().then(function(userToken) {
+          // Step 4: User has authorized; userToken returned.
+          // Step 5: Send userToken to app:
+          // For WebView, post message to Android app:
+          window.ReactNativeWebView
+            ? window.ReactNativeWebView.postMessage(userToken)
+            : alert('User Token: ' + userToken);
+        }).catch(function(err) {
+          alert('Authorization failed: ' + err);
+        });
+      };
+    });
+  </script>
+</body>
+</html>
