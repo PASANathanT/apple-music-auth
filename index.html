@@ -40,35 +40,54 @@
   <h2>Apple Music Authorization</h2>
   <button id="authorizeBtn">Authorize</button>
   <script>
-    let music; // declare this outside functions to make it accessible
-
-    // Wait a bit for MusicKit JS to load
-    setTimeout(function() {
-      if (window.MusicKit) {
-        MusicKit.configure({
+    document.addEventListener('musickitloaded', async function () {
+      // Call configure() to configure an instance of MusicKit on the Web.
+      try {
+        await MusicKit.configure({
           developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDYxNTU2LCJpYXQiOjE3NjQ5NzUxNTZ9.0OiccGfYjx8ZValMtL2DwxQ0KPp_5tpGLbaGIk_PZrYmi7VARsA6GN0UGJSRHKBydezyeFDn3bKl3Kdcg1LE1',
           app: {
             name: 'com.pasa.mediaplayer',
             build: '1.0'
           }
         });
-        music = MusicKit.getInstance();
-      } else {
-        alert('MusicKit JS did not load!');
+      } catch (err) {
+        // Handle configuration error
       }
-    }, 1000);
 
-    document.getElementById('authorizeBtn').onclick = function() {
-      if (music) {
-        music.authorize().then(function(userToken) {
-          alert('User Token: ' + userToken);
-        }).catch(function(err) {
-          alert('Authorization failed: ' + err);
-        });
-      } else {
-        alert('MusicKit JS not loaded yet. Please wait and try again.');
-      }
-    };
+      // MusicKit instance is available
+      const music = MusicKit.getInstance();
+    });
+
+    
+    // let music; // declare this outside functions to make it accessible
+
+    // // Wait a bit for MusicKit JS to load
+    // setTimeout(function() {
+    //   if (window.MusicKit) {
+    //     MusicKit.configure({
+    //       developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDYxNTU2LCJpYXQiOjE3NjQ5NzUxNTZ9.0OiccGfYjx8ZValMtL2DwxQ0KPp_5tpGLbaGIk_PZrYmi7VARsA6GN0UGJSRHKBydezyeFDn3bKl3Kdcg1LE1',
+    //       app: {
+    //         name: 'com.pasa.mediaplayer',
+    //         build: '1.0'
+    //       }
+    //     });
+    //     music = MusicKit.getInstance();
+    //   } else {
+    //     alert('MusicKit JS did not load!');
+    //   }
+    // }, 1000);
+
+    // document.getElementById('authorizeBtn').onclick = function() {
+    //   if (music) {
+    //     music.authorize().then(function(userToken) {
+    //       alert('User Token: ' + userToken);
+    //     }).catch(function(err) {
+    //       alert('Authorization failed: ' + err);
+    //     });
+    //   } else {
+    //     alert('MusicKit JS not loaded yet. Please wait and try again.');
+    //   }
+    // };
   </script>
 </body>
 </html>
