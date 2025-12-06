@@ -1,4 +1,36 @@
-<!DOCTYPE html>
+<script>
+  document.addEventListener('musickitloaded', function() {
+    console.log('musickitloaded event fired');
+    try {
+      MusicKit.configure({
+        developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDcxNTg1LCJpYXQiOjE3NjQ5ODUxODV9.7UcDDNXIbtnKD3boEXzQSd-tqLOmM2VWcieVVYzc5UuAV3Ht5sEXvXvXDElnyRSjWgx-Mpsx8fVMgyRBGggFRw',
+        app: { name: 'com.pasa.mediaplayer', build: '1.0' }
+      });
+      const music = MusicKit.getInstance();
+      console.log('MusicKit instance inside musickitloaded:', music);
+      document.getElementById('authorizeBtn').disabled = false;
+      document.getElementById('authorizeBtn').onclick = function() {
+        console.log('Authorize button clicked');
+        document.getElementById('output').textContent = '';
+        music.authorize()
+          .then(function(userToken) {
+            console.log('Authorization successful. User token:', userToken);
+            document.getElementById('output').textContent = 'User Token:\n\n' + userToken;
+          })
+          .catch(function(error) {
+            console.error('Authorization failed:', error);
+            document.getElementById('output').textContent = 'Authorization failed:\n\n' + error;
+          });
+      };
+    } catch (error) {
+      console.error('Error configuring MusicKit:', error);
+    }
+  });
+</script>
+
+
+
+<!-- <!DOCTYPE html>
 <html>
 <head>
   <title>Apple MusicKit JS Example (No musickitloaded)</title>
@@ -49,7 +81,7 @@
     };
   </script>
 </body>
-</html>
+</html> -->
 
 
 <!-- <!DOCTYPE html>
