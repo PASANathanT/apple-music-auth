@@ -1,5 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Apple MusicKit JS Reliable Init Example</title>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+</head>
+<body>
+  <h2>Apple Music Authorization</h2>
+  <button id="authorizeBtn" disabled>Authorize</button>
+  <pre id="output"></pre>
+  <script>
+    let music;
+    function initializeMusicKit() {
+      if (window.MusicKit) {
+        console.log('MusicKit JS is present!');
+        try {
+          MusicKit.configure({
+            developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDcxNTg1LCJpYXQiOjE3NjQ5ODUxODV9.7UcDDNXIbtnKD3boEXzQSd-tqLOmM2VWcieVVYzc5UuAV3Ht5sEXvXvXDElnyRSjWgx-Mpsx8fVMgyRBGggFRw',
+            app: { name: 'com.pasa.mediaplayer', build: '1.0' }
+          });
+          music = MusicKit.getInstance();
+          console.log('MusicKit instance:', music);
+          document.getElementById('authorizeBtn').disabled = false;
+        } catch (error) {
+          console.error('MusicKit configure error:', error);
+        }
+      } else {
+        console.log('MusicKit JS is NOT loaded.');
+      }
+    }
+    // Wait until JS likely loaded, then initialize
+    setTimeout(initializeMusicKit, 2000);
+
+    document.getElementById('authorizeBtn').onclick = function() {
+      console.log('Authorize button clicked');
+      document.getElementById('output').textContent = '';
+      if (!music) {
+        console.log('MusicKit not initialized yet.');
+        document.getElementById('output').textContent = 'MusicKit not initialized yet. Please wait and try again.';
+        return;
+      }
+      music.authorize()
+        .then(function(userToken) {
+          console.log('Authorization successful. User token:', userToken);
+          document.getElementById('output').textContent = 'User Token:\n\n' + userToken;
+        })
+        .catch(function(error) {
+          console.error('Authorization failed:', error);
+          document.getElementById('output').textContent = 'Authorization failed:\n\n' + error;
+        });
+    };
+  </script>
+</body>
+</html>
 
 
+<!-- 
 <!DOCTYPE html>
 <html>
 <head>
@@ -40,7 +95,7 @@
   });
 </script>
 </body>
-</html>
+</html> -->
 
 
 
