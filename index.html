@@ -60,7 +60,28 @@
 </html> -->
 
 
+
 <html>
+  <script src="https://js-cdn.music.apple.com/musickit/v1/musickit.js"></script>
+  <script>
+    document.addEventListener('musickitloaded', function () {
+      MusicKit.configure({
+        developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDc2NzYyLCJpYXQiOjE3NjQ5OTAzNjJ9.Y8e923mo-Tw0mdkoFQ6oXp1UurfloLAZ33dXheJypR21MmR6J79a4kSCSWD6LAMb7LxW5JcRSPOzphplsIkE1w',
+        app: {
+          name: 'com.pasa.mediaplayer',
+          build: '1',
+        },
+      });
+      const music = MusicKit.getInstance();
+      music.authorize().then(function (userToken) {
+        console.log('Apple Music User Token:', userToken);
+        window.location.href = 'pasa-mediaplayer://applemusic/callback?token=' + encodeURIComponent(userToken);
+      });
+    });
+  </script>
+</html>
+
+<!-- <html>
   <script src="https://js-cdn.music.apple.com/musickit/v1/musickit.js"></script>
   <script>
     document.addEventListener('musickitloaded', function () {
@@ -77,7 +98,17 @@
       })
     })
   </script>
-</html>
+</html> -->
+
+
+
+
+
+
+
+
+
+
 
 <!-- <!DOCTYPE html>
 <html>
