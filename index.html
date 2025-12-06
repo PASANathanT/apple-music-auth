@@ -77,8 +77,10 @@
       if (window.MusicKit) {
         console.log('MusicKit JS is present!');
 
+        await music.authorize();
+
         try {
-          window.MusicKit.configure({
+          MusicKit.configure({
             developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDc2NzYyLCJpYXQiOjE3NjQ5OTAzNjJ9.Y8e923mo-Tw0mdkoFQ6oXp1UurfloLAZ33dXheJypR21MmR6J79a4kSCSWD6LAMb7LxW5JcRSPOzphplsIkE1w',
             app: { name: 'com.pasa.mediaplayer', build: '1.0' }
           });
