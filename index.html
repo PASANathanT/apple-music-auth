@@ -302,6 +302,7 @@
       const music = MusicKit.getInstance();
       // Attach click handler here, AFTER initialization
       document.getElementById('authorizeBtn').onclick = function() {
+        console.log('Authorize button clicked');
         music.authorize().then(function(userToken) {
           alert('User Token: ' + userToken);
           // console.log('User Token: ' + userToken);
