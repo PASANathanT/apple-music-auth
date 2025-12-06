@@ -72,32 +72,48 @@
   <pre id="output"></pre>
   <script async>
     // SHOWS MUSICKIT ******************************************************************************************
+
+    const music = MusicKit.getInstance();
+    
+    // Music previews can be played without authorization:
+    await music.play();
+    
+    // To play the full length of a song, check authorization before calling play():
+    await music.authorize();
+    await music.play();
+    
+    // You should check authorization before accessing user's iCloud Music Library:
+    await music.authorize();
+    const { data: result } = await music.api.music('v1/me/library/albums');
+    // User's iCloud Music Library Albums
+    console.log(result.data);
+    
     setTimeout(function() {
       console.log('window.MusicKit:', window.MusicKit);
       if (window.MusicKit) {
         console.log('MusicKit JS is present!');
 
-        await music.authorize();
+      //   await music.authorize();
 
-        try {
-          MusicKit.configure({
-            developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDc2NzYyLCJpYXQiOjE3NjQ5OTAzNjJ9.Y8e923mo-Tw0mdkoFQ6oXp1UurfloLAZ33dXheJypR21MmR6J79a4kSCSWD6LAMb7LxW5JcRSPOzphplsIkE1w',
-            app: { name: 'com.pasa.mediaplayer', build: '1.0' }
-          });
-          music = window.MusicKit.getInstance();
-          console.log('MusicKit instance:', music);
-          if (music) {
-            document.getElementById('authorizeBtn').disabled = false;
-            console.log('Authorize button enabled');
-          } else {
-            console.log('MusicKit.getInstance() returned undefined.');
-          }
-        } catch (error) {
-          console.error('MusicKit configure error:', error);
-        }
-      } else {
-        console.log('MusicKit JS is NOT loaded.');
-      }
+      //   try {
+      //     MusicKit.configure({
+      //       developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDc2NzYyLCJpYXQiOjE3NjQ5OTAzNjJ9.Y8e923mo-Tw0mdkoFQ6oXp1UurfloLAZ33dXheJypR21MmR6J79a4kSCSWD6LAMb7LxW5JcRSPOzphplsIkE1w',
+      //       app: { name: 'com.pasa.mediaplayer', build: '1.0' }
+      //     });
+      //     music = window.MusicKit.getInstance();
+      //     console.log('MusicKit instance:', music);
+      //     if (music) {
+      //       document.getElementById('authorizeBtn').disabled = false;
+      //       console.log('Authorize button enabled');
+      //     } else {
+      //       console.log('MusicKit.getInstance() returned undefined.');
+      //     }
+      //   } catch (error) {
+      //     console.error('MusicKit configure error:', error);
+      //   }
+      // } else {
+      //   console.log('MusicKit JS is NOT loaded.');
+      // }
     }, 2000);
   </script>
 </body>
