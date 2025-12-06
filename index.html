@@ -1,3 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Apple MusicKit JS Example (Enable Button)</title>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+</head>
+<body>
+  <h2>Apple Music Authorization</h2>
+  <button id="authorizeBtn" disabled>Authorize</button>
+  <pre id="output"></pre>
+  <script>
+    let music;
+    // Keep checking every 100ms until MusicKit is present
+    function initializeMusicKit() {
+      if (window.MusicKit) {
+        console.log('MusicKit JS is present!');
+        try {
+          MusicKit.configure({
+            developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDcxNTg1LCJpYXQiOjE3NjQ5ODUxODV9.7UcDDNXIbtnKD3boEXzQSd-tqLOmM2VWcieVVYzc5UuAV3Ht5sEXvXvXDElnyRSjWgx-Mpsx8fVMgyRBGggFRw',
+            app: { name: 'com.pasa.mediaplayer', build: '1.0' }
+          });
+          music = MusicKit.getInstance();
+          console.log('MusicKit instance:', music);
+          if (music) {
+            document.getElementById('authorizeBtn').disabled = false;
+            console.log('Authorize button enabled');
+          } else {
+            console.log('MusicKit.getInstance() returned undefined.');
+          }
+        } catch (error) {
+          console.error('MusicKit configure error:', error);
+        }
+      } else {
+        // Try again in 100ms
+        setTimeout(initializeMusicKit, 100);
+      }
+    }
+    initializeMusicKit();
+
+    document.getElementById('authorizeBtn').onclick = function() {
+      console.log('Authorize button clicked');
+      document.getElementById('output').textContent = '';
+      if (!music) {
+        console.log('MusicKit not initialized yet.');
+        document.getElementById('output').textContent = 'MusicKit not initialized yet. Please wait and try again.';
+        return;
+      }
+      music.authorize()
+        .then(function(userToken) {
+          console.log('Authorization successful. User token:', userToken);
+          document.getElementById('output').textContent = 'User Token:\n\n' + userToken;
+        })
+        .catch(function(error) {
+          console.error('Authorization failed:', error);
+          document.getElementById('output').textContent = 'Authorization failed:\n\n' + error;
+        });
+    };
+  </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Apple MusicKit JS Example with Logs</title>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+</head>
+<body>
+  <h2>Apple Music Authorization</h2>
+  <button id="authorizeBtn" disabled>Authorize</button>
+  <pre id="output"></pre>
+  <script>
+    // SHOWS MUSICKIT ******************************************************************************************
+    setTimeout(function() {
+      console.log('window.MusicKit:', window.MusicKit);
+      if (window.MusicKit) {
+        console.log('MusicKit JS is present!');
+      } else {
+        console.log('MusicKit JS is NOT loaded.');
+      }
+    }, 2000);
+  </script>
+</body>
+</html> -->
+
 <!-- <!DOCTYPE html>
 <html>
 <head>
@@ -245,41 +331,6 @@
   </script>
 </body>
 </html> -->
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Apple MusicKit JS Example with Logs</title>
-  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
-</head>
-<body>
-  <h2>Apple Music Authorization</h2>
-  <button id="authorizeBtn" disabled>Authorize</button>
-  <pre id="output"></pre>
-  <script>
-    // SHOWS MUSICKIT ******************************************************************************************
-    setTimeout(function() {
-      console.log('window.MusicKit:', window.MusicKit);
-      if (window.MusicKit) {
-        console.log('MusicKit JS is present!');
-      } else {
-        console.log('MusicKit JS is NOT loaded.');
-      }
-    }, 2000);
-  </script>
-</body>
-</html>
-
-
-
-
-
 
 
 
