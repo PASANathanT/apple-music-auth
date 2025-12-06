@@ -75,7 +75,8 @@
       const music = MusicKit.getInstance();
       music.authorize().then(function (userToken) {
         console.log('Apple Music User Token:', userToken);
-        window.location.href = 'pasa-mediaplayer://applemusic/callback?token=' + encodeURIComponent(userToken);
+        // window.location.href = 'pasa-mediaplayer://applemusic/callback?token=' + encodeURIComponent(userToken);
+        window.location.href = 'intent://applemusic/callback?token=' + encodeURIComponent(userToken) + '#Intent;scheme=pasa-mediaplayer;package=com.pasa.mediaplayer;end';
       });
     });
   </script>
