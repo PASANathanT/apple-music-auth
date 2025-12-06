@@ -301,9 +301,11 @@
       // Attach click handler here, AFTER initialization
       document.getElementById('authorizeBtn').onclick = function() {
         music.authorize().then(function(userToken) {
-          alert('User Token: ' + userToken);
+          // alert('User Token: ' + userToken);
+          console.log('User Token: ' + userToken);
         }).catch(function(err) {
-          alert('Authorization failed: ' + err);
+          // alert('Authorization failed: ' + err);
+          console.log('Authorization failed: ' + err);
         });
       };
     });
