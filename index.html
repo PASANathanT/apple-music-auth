@@ -1,6 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>Apple MusicKit JS Example (No musickitloaded)</title>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+</head>
+<body>
+  <h2>Apple Music Authorization</h2>
+  <button id="authorizeBtn">Authorize</button>
+  <pre id="output"></pre>
+  <script>
+    // Wait for MusicKit JS to load (2 seconds is enough)
+    setTimeout(function() {
+      if (window.MusicKit) {
+        console.log('MusicKit JS is present!');
+        MusicKit.configure({
+        developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY0OTE5MzIzLCJpYXQiOjE3NjQ4MzI5MjN9.TO5fOhkYu87wLcfH0SAFHzUBmiXDOhgqEgYFPsUK9fqIfZcWjjl86ixbhod-ryCDywdg9aUH90fN5Z7rDLOB3A',
+        app: { name: 'com.pasa.mediaplayer', build: '1.0' }
+        });
+        const music = MusicKit.getInstance();
+        document.getElementById('authorizeBtn').onclick = function() {
+          console.log('Authorize button clicked');
+          document.getElementById('output').textContent = '';
+          music.authorize()
+            .then(function(userToken) {
+              console.log('Authorization successful. User token:', userToken);
+              document.getElementById('output').textContent = 'User Token:\n\n' + userToken;
+            })
+            .catch(function(error) {
+              console.error('Authorization failed:', error);
+              document.getElementById('output').textContent = 'Authorization failed:\n\n' + error;
+            });
+        };
+      } else {
+        console.log('MusicKit JS is NOT loaded.');
+        alert('MusicKit JS is NOT loaded.');
+      }
+    }, 2000);
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
   <title>Apple MusicKit JS Example with Logs</title>
   <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
 </head>
@@ -17,61 +64,9 @@
         console.log('MusicKit JS is NOT loaded.');
       }
     }, 2000);
-
-
-    
-    // console.log('Page loaded. Waiting for MusicKit JS...');
-
-    // // Fires when MusicKit JS is loaded and ready
-    // document.addEventListener('musickitloaded', function() {
-    //   console.log('MusicKit JS loaded event fired');
-    //   try {
-    //     MusicKit.configure({
-    //       developerToken: 'eyJraWQiOiI3S001TkM5RFM3IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDYxNTU2LCJpYXQiOjE3NjQ5NzUxNTZ9.0OiccGfYjx8ZValMtL2DwxQ0KPp_5tpGLbaGIk_PZrYmi7VARsA6GN0UGJSRHKBydezyeFDn3bKl3Kdcg1LE1',
-    //       app: {
-    //         name: 'com.pasa.mediaplayer',
-    //         build: '1.0'
-    //       }
-    //     });
-    //     console.log('MusicKit configured!');
-    //   } catch (e) {
-    //     console.error('MusicKit configure error:', e);
-    //   }
-
-    //   document.getElementById('authorizeBtn').disabled = false;
-    //   console.log('Authorize button enabled');
-
-    //   const music = MusicKit.getInstance();
-    //   console.log('MusicKit instance:', music);
-
-    //   document.getElementById('authorizeBtn').onclick = function() {
-    //     console.log('Authorize button clicked');
-    //     document.getElementById('output').textContent = '';
-    //     // Try to authorize
-    //     music.authorize()
-    //       .then(function(userToken) {
-    //         console.log('Authorization successful. User token:', userToken);
-    //         document.getElementById('output').textContent = 'User Token:\n\n' + userToken;
-    //       })
-    //       .catch(function(error) {
-    //         console.error('Authorization failed:', error);
-    //         document.getElementById('output').textContent = 'Authorization failed:\n\n' + error;
-    //       });
-    //   };
-    // });
-
-    // // Extra: log errors loading MusicKit JS
-    // window.addEventListener('error', function(e) {
-    //   console.error('Window error:', e.message, e.filename, e.lineno);
-    // });
-
-    // // Extra: log when button is clicked (even if not enabled yet)
-    // document.getElementById('authorizeBtn').addEventListener('click', function() {
-    //   console.log('Authorize button event fired');
-    // });
   </script>
 </body>
-</html>
+</html> -->
 
 
 
