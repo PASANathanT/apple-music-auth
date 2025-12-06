@@ -64,13 +64,13 @@
 <html>
 <head>
   <title>Apple MusicKit JS Example with Logs</title>
-  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async></script>
 </head>
 <body>
   <h2>Apple Music Authorization</h2>
   <button id="authorizeBtn" disabled>Authorize</button>
   <pre id="output"></pre>
-  <script>
+  <script async>
     // SHOWS MUSICKIT ******************************************************************************************
     setTimeout(function() {
       console.log('window.MusicKit:', window.MusicKit);
