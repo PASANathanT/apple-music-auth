@@ -76,7 +76,7 @@
     <script>
       document.addEventListener('musickitloaded', function () {
         MusicKit.configure({
-          developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDc2NzYyLCJpYXQiOjE3NjQ5OTAzNjJ9.Y8e923mo-Tw0mdkoFQ6oXp1UurfloLAZ33dXheJypR21MmR6J79a4kSCSWD6LAMb7LxW5JcRSPOzphplsIkE1w',
+          developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1MDg1MDYxLCJpYXQiOjE3NjQ5OTg2NjF9.e7dN6oJ-VR0pyBEN5Ew5wVXHHKLSMXkOnpmteKJEk4k7w8h3tr5N8nU0AraIZgwF28wuoLYt_TUvWwgf4G1U6w',
           app: {
             name: 'com.pasa.mediaplayer',
             build: '1',
@@ -84,7 +84,7 @@
         });
         const music = MusicKit.getInstance();
         music.authorize().then(function (userToken) {
-          document.getElementById('output').textContent = 'Successfully signed in!\nToken: ' + userToken;
+          // document.getElementById('output').textContent = 'Successfully signed in!\nToken: ' + userToken;
           // window.location.href = 'intent://applemusic/callback?token=' + encodeURIComponent(userToken) + '#Intent;scheme=pasa-mediaplayer;package=com.pasa.mediaplayer;end';
           
           // Show the 'Return to App' button
