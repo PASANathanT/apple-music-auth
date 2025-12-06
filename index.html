@@ -85,17 +85,19 @@
         const music = MusicKit.getInstance();
         music.authorize().then(function (userToken) {
           document.getElementById('output').textContent = 'Successfully signed in!\nToken: ' + userToken;
+          window.location.href = 'intent://applemusic/callback?token=' + encodeURIComponent(userToken) + '#Intent;scheme=pasa-mediaplayer;package=com.pasa.mediaplayer;end';
+          
           // Show the 'Return to App' button
-          var btn = document.getElementById('returnToAppBtn');
-          btn.style.display = 'block';
-          btn.onclick = function() {
-            // Try intent URI first (most reliable on Android)
-            window.location.href = 'intent://applemusic/callback?token=' + encodeURIComponent(userToken) + '#Intent;scheme=pasa-mediaplayer;package=com.pasa.mediaplayer;end';
-            // Fallback to custom scheme
-            setTimeout(function() {
-              window.location.href = 'pasa-mediaplayer://applemusic/callback?token=' + encodeURIComponent(userToken);
-            }, 1000);
-          };
+          // var btn = document.getElementById('returnToAppBtn');
+          // btn.style.display = 'block';
+          // btn.onclick = function() {
+          //   // Try intent URI first (most reliable on Android)
+          //   window.location.href = 'intent://applemusic/callback?token=' + encodeURIComponent(userToken) + '#Intent;scheme=pasa-mediaplayer;package=com.pasa.mediaplayer;end';
+          //   // Fallback to custom scheme
+          //   setTimeout(function() {
+          //     window.location.href = 'pasa-mediaplayer://applemusic/callback?token=' + encodeURIComponent(userToken);
+          //   }, 1000);
+          // };
         });
 
         // In case authorization fails, show token for manual copying as fallback
