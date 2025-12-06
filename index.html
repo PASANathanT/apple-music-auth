@@ -9,6 +9,17 @@
   <button id="authorizeBtn" disabled>Authorize</button>
   <pre id="output"></pre>
   <script>
+    setTimeout(function() {
+      console.log('window.MusicKit:', window.MusicKit);
+      if (window.MusicKit) {
+        console.log('MusicKit JS is present!');
+      } else {
+        console.log('MusicKit JS is NOT loaded.');
+      }
+    }, 2000);
+
+
+    
     console.log('Page loaded. Waiting for MusicKit JS...');
 
     // Fires when MusicKit JS is loaded and ready
