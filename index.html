@@ -1,3 +1,15 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Apple MusicKit JS Example (No musickitloaded)</title>
+  <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+</head>
+<body>
+  <h2>Apple Music Authorization</h2>
+  <button id="authorizeBtn" disabled>Authorize</button>
+  <pre id="output"></pre>
 <script>
   document.addEventListener('musickitloaded', function() {
     console.log('musickitloaded event fired');
@@ -27,6 +39,8 @@
     }
   });
 </script>
+</body>
+</html>
 
 
 
