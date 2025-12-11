@@ -71,6 +71,78 @@
   <body>
     <h2>Apple Music Authorization</h2>
     <pre id="output"></pre>
+    <button id="returnToAppBtn" style="display:none;">Return to App</button>
+    <script>
+      // Helper to get device_code from the URL
+      function getQueryParam(param) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(param);
+      }
+      const deviceCode = getQueryParam('device_code');
+
+      document.addEventListener('musickitloaded', function () {
+        MusicKit.configure({
+          developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1NTE2NTk5LCJpYXQiOjE3NjU0MzAxOTl9.W41aciYx6ynUf440vNXCmkBlvYXSM-YgXoCkULY6NkmJBDehMlnaUlHi0wtFzL0UzpKVnN-ScWIQBg2hUYjIgA',
+          app: {
+            name: 'com.pasa.mediaplayer',
+            build: '1',
+          },
+        });
+        const music = MusicKit.getInstance();
+        music.authorize().then(function (userToken) {
+          // POST deviceCode and userToken to your backend
+          if (deviceCode) {
+            fetch('https://signinwithapplebackendserver.onrender.com/link-apple-token', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                device_code: deviceCode,
+                user_token: userToken
+              })
+            })
+            .then(function(response) {
+              if (response.ok) {
+                document.getElementById('output').textContent = 
+                  'Apple Music login successful!\nYou may now return to your device.';
+              } else {
+                document.getElementById('output').textContent = 
+                  'Login OK, but failed to notify your device.';
+              }
+            })
+            .catch(function(err) {
+              document.getElementById('output').textContent = 'Error contacting backend: ' + err;
+            });
+          } else {
+            document.getElementById('output').textContent = 'Successfully signed in!\nToken: ' + userToken;
+          }
+
+          // Show the 'Return to App' button
+          var btn = document.getElementById('returnToAppBtn');
+          btn.style.display = 'block';
+          btn.onclick = function() {
+            window.location.href = 'intent://applemusic/callback?token=' + encodeURIComponent(userToken) + '#Intent;scheme=pasa-mediaplayer;package=com.pasa.mediaplayer;end';
+            setTimeout(function() {
+              window.location.href = 'pasa-mediaplayer://applemusic/callback?token=' + encodeURIComponent(userToken);
+            }, 1000);
+          };
+        });
+
+        /*
+        music.authorize().catch(function (err) {
+          document.getElementById('output').textContent =
+            'Authorization failed: ' + err;
+        });
+        */
+      });
+    </script>
+  </body>
+</html>
+
+<!-- <html>
+  <script src="https://js-cdn.music.apple.com/musickit/v1/musickit.js"></script>
+  <body>
+    <h2>Apple Music Authorization</h2>
+    <pre id="output"></pre>
     <button id="returnToAppBtn">Return to App</button>
     <script>
       document.addEventListener('musickitloaded', function () {
@@ -110,7 +182,11 @@
       });
     </script>
   </body>
-</html>
+</html> -->
+
+
+
+
 
 
 <!-- <html>
