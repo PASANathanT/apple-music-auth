@@ -344,10 +344,12 @@
         return url.searchParams.get(param);
       }
       const deviceCode = getQueryParam('device_code');
+      const developerToken = getQueryParam('developer_token');
+//  developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY0ODMyMTA4LCJpYXQiOjE3NjY0NTk5Nzd9.3UPxQAAdBl6qEvkSfOisFwTm9htAN4-OYrUxR7qMNGcPBljN63V6XIcifcKU3JUScLM1xlzloRfogodJ0jd_4g',
 
       document.addEventListener('musickitloaded', function () {
         MusicKit.configure({
-          developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY0ODMyMTA4LCJpYXQiOjE3NjY0NTk5Nzd9.3UPxQAAdBl6qEvkSfOisFwTm9htAN4-OYrUxR7qMNGcPBljN63V6XIcifcKU3JUScLM1xlzloRfogodJ0jd_4g',
+          developerToken: developerToken,
           app: {
             name: 'com.pasa.mediaplayer',
             build: '1',
