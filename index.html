@@ -353,7 +353,7 @@
 
   // Display the values on the page
       document.getElementById('deviceCodeDisplay').textContent = deviceCode || 'Not provided';
-      document.getElementById('developerTokenDisplay').textContent = developerToken ? developerToken.substring(0, 50) + '...' : 'Not provided';
+      document.getElementById('developerTokenDisplay').textContent = developerToken ? developerToken : 'Not provided';
       
       document.addEventListener('musickitloaded', function () {
         MusicKit.configure({
