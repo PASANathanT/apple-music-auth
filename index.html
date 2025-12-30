@@ -361,6 +361,18 @@
       document.getElementById('developerTokenDisplay').textContent = developerToken ? developerToken : 'Not provided';
       
       document.addEventListener('musickitloaded', function () {
+      console.log('MusicKit loaded');
+
+      // try {
+      //   MusicKit.configure({
+      //     developerToken: developerToken,
+      //     app: {
+      //       name: 'com.pasa.mediaplayer',
+      //       build: '1',
+      //     },
+      // });
+      // console.log('MusicKit configured');
+        
         MusicKit.configure({
           developerToken: developerToken,
           app: {
@@ -368,8 +380,14 @@
             build: '1',
           },
         });
+        console.log('MusicKit configured');
+        
         const music = MusicKit.getInstance();
+        console.log('MusicKit instance: ', music);
+        
         music.authorize().then(function (userToken) {
+          console.log('Authorization successful, userToken: ', userToken);
+          
           // POST deviceCode and userToken to your backend
           if (deviceCode) {
             fetch('https://signinwithapplebackendserver.onrender.com/link-apple-token', {
@@ -407,13 +425,18 @@
           };
         });
 
-        /*
         music.authorize().catch(function (err) {
+          console.error('Authorization failed:', err);
           document.getElementById('output').textContent =
             'Authorization failed: ' + err;
         });
-        */
       });
+
+      // Fallback: check if MusicKit is already loaded
+      if (window.MusicKit) {
+        console.log('MusicKit already available');
+        document.dispatchEvent(new Event('musickitloaded'));
+      }
     </script>
   </body>
 </html>
