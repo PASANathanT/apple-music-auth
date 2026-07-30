@@ -453,73 +453,74 @@
         musicKitBooted = true;
         logStep('musickitloaded event fired');
 
-        try {
-          MusicKit.configure({
-            developerToken: developerToken,
-            app: {
-              name: 'com.pasa.mediaplayer',
-              build: '1',
-            },
-          });
+        // MusicKit v3's configure() is asynchronous - it returns a Promise
+        // that resolves with the instance, unlike v1 where configure() was
+        // synchronous and a separate MusicKit.getInstance() call worked
+        // immediately afterward. Calling getInstance() before this Promise
+        // resolves returns undefined, which is why authorize() was throwing
+        // "cannot read properties of undefined".
+        MusicKit.configure({
+          developerToken: developerToken,
+          app: {
+            name: 'com.pasa.mediaplayer',
+            build: '1',
+          },
+        }).then(function (music) {
           logStep('MusicKit.configure() succeeded');
-        } catch (e) {
-          logStep('MusicKit.configure() threw: ' + e.message);
-          outputEl.textContent = 'Failed to configure Apple Music sign-in: ' + e.message;
-          return;
-        }
 
-        const music = MusicKit.getInstance();
-        logStep('MusicKit instance obtained');
+          // Only start the Apple sign-in flow from a real tap - authorize()
+          // is more reliable across mobile browsers when it originates from a
+          // direct user gesture rather than firing automatically on page load.
+          signInBtn.style.display = 'block';
+          signInBtn.onclick = function () {
+            signInBtn.style.display = 'none';
+            outputEl.textContent = 'Opening Apple sign-in...';
+            logStep('Sign-in button tapped, calling authorize()');
 
-        // Only start the Apple sign-in flow from a real tap - authorize()
-        // is more reliable across mobile browsers when it originates from a
-        // direct user gesture rather than firing automatically on page load.
-        signInBtn.style.display = 'block';
-        signInBtn.onclick = function () {
-          signInBtn.style.display = 'none';
-          outputEl.textContent = 'Opening Apple sign-in...';
-          logStep('Sign-in button tapped, calling authorize()');
+            let authorizeSettled = false;
+            const authorizeWatchdog = setTimeout(function () {
+              if (authorizeSettled) return;
+              logStep('authorize() has not responded after 20s - likely a blocked pop-up or blocked cookies/storage.');
+              outputEl.textContent = 'Sign-in did not respond. This is often caused by a blocked pop-up or blocked cookies. ' +
+                'Check your browser for a blocked pop-up notification and allow it, or check that cookies are allowed, then tap Sign in again.';
+              signInBtn.style.display = 'block';
+            }, 20000);
 
-          let authorizeSettled = false;
-          const authorizeWatchdog = setTimeout(function () {
-            if (authorizeSettled) return;
-            logStep('authorize() has not responded after 20s - likely a blocked pop-up or blocked cookies/storage.');
-            outputEl.textContent = 'Sign-in did not respond. This is often caused by a blocked pop-up or blocked cookies. ' +
-              'Check your browser for a blocked pop-up notification and allow it, or check that cookies are allowed, then tap Sign in again.';
-            signInBtn.style.display = 'block';
-          }, 20000);
-
-          let authorizePromise;
-          try {
-            authorizePromise = music.authorize();
-          } catch (e) {
-            authorizeSettled = true;
-            clearTimeout(authorizeWatchdog);
-            logStep('authorize() threw synchronously: ' + e.message);
-            outputEl.textContent = 'Sign-in failed to start: ' + e.message;
-            signInBtn.style.display = 'block';
-            return;
-          }
-
-          authorizePromise.then(function (userToken) {
-            authorizeSettled = true;
-            clearTimeout(authorizeWatchdog);
-            logStep('authorize() resolved successfully');
-
-            if (deviceCode) {
-              linkTokenToBackend(userToken, 1);
-            } else {
-              outputEl.textContent = 'Successfully signed in!\nToken: ' + userToken;
+            let authorizePromise;
+            try {
+              authorizePromise = music.authorize();
+            } catch (e) {
+              authorizeSettled = true;
+              clearTimeout(authorizeWatchdog);
+              logStep('authorize() threw synchronously: ' + e.message);
+              outputEl.textContent = 'Sign-in failed to start: ' + e.message;
+              signInBtn.style.display = 'block';
+              return;
             }
-          }).catch(function (err) {
-            authorizeSettled = true;
-            clearTimeout(authorizeWatchdog);
-            const errMsg = err && err.message ? err.message : err;
-            logStep('authorize() rejected: ' + errMsg);
-            outputEl.textContent = 'Authorization failed: ' + errMsg;
-            signInBtn.style.display = 'block';
-          });
-        };
+
+            authorizePromise.then(function (userToken) {
+              authorizeSettled = true;
+              clearTimeout(authorizeWatchdog);
+              logStep('authorize() resolved successfully');
+
+              if (deviceCode) {
+                linkTokenToBackend(userToken, 1);
+              } else {
+                outputEl.textContent = 'Successfully signed in!\nToken: ' + userToken;
+              }
+            }).catch(function (err) {
+              authorizeSettled = true;
+              clearTimeout(authorizeWatchdog);
+              const errMsg = err && err.message ? err.message : err;
+              logStep('authorize() rejected: ' + errMsg);
+              outputEl.textContent = 'Authorization failed: ' + errMsg;
+              signInBtn.style.display = 'block';
+            });
+          };
+        }).catch(function (e) {
+          logStep('MusicKit.configure() rejected: ' + (e && e.message ? e.message : e));
+          outputEl.textContent = 'Failed to configure Apple Music sign-in: ' + (e && e.message ? e.message : e);
+        });
       });
 
       // Fallback: check if MusicKit is already loaded
