@@ -340,6 +340,8 @@
       <p><strong>Developer Token:</strong> <span id="developerTokenDisplay">Loading...</span></p>
     </div>
     <pre id="output"></pre>
+    <button id="signInBtn" style="display:none;">Sign in with Apple Music</button>
+    <button id="retryLinkBtn" style="display:none;">Retry</button>
     <button id="returnToAppBtn" style="display:none;">Return to App</button>
     <script>
       // Helper to get device_code from the URL
@@ -351,28 +353,63 @@
       const developerToken = getQueryParam('developer_token');
       console.log('deviceCode: ', deviceCode);
       console.log('developerToken: ', developerToken);
-//  developerToken: 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY0ODMyMTA4LCJpYXQiOjE3NjY0NTk5Nzd9.3UPxQAAdBl6qEvkSfOisFwTm9htAN4-OYrUxR7qMNGcPBljN63V6XIcifcKU3JUScLM1xlzloRfogodJ0jd_4g',
 
-      // developerToken = 'eyJraWQiOiJXVUM2ODk5NkZEIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJhcHBzdG9yZWNvbm5lY3QtdjEiLCJpc3MiOiI0WlczMzlVM0c4IiwiZXhwIjoxNzY1NDI3Njk2LCJpYXQiOjE3NjcwNTU1NjZ9.s39H5cVQa1nWWMFH4M1bX3Tc525gXvyMiewnWtqOPkut6cmsY-cDGJOdenpN5db_CIMUYik2pDskLVM3wL0nMA';
-      // console.log('developerToken2: ', developerToken);
-      
   // Display the values on the page
       document.getElementById('deviceCodeDisplay').textContent = deviceCode || 'Not provided';
       document.getElementById('developerTokenDisplay').textContent = developerToken ? developerToken : 'Not provided';
-      
-      document.addEventListener('musickitloaded', function () {
-      console.log('MusicKit loaded');
 
-      // try {
-      //   MusicKit.configure({
-      //     developerToken: developerToken,
-      //     app: {
-      //       name: 'com.pasa.mediaplayer',
-      //       build: '1',
-      //     },
-      // });
-      // console.log('MusicKit configured');
-        
+      const outputEl = document.getElementById('output');
+      const signInBtn = document.getElementById('signInBtn');
+      const retryLinkBtn = document.getElementById('retryLinkBtn');
+      const returnToAppBtn = document.getElementById('returnToAppBtn');
+
+      // POSTs deviceCode/userToken to the backend, retrying on failure to
+      // absorb a slow first request or a transient network/server hiccup.
+      function linkTokenToBackend(userToken, attempt) {
+        attempt = attempt || 1;
+        const maxAttempts = 3;
+        const backoffMs = [2000, 4000];
+
+        if (attempt === 1) {
+          outputEl.textContent = 'Signing you in...';
+        } else {
+          outputEl.textContent = 'Still trying to reach the server (attempt ' + attempt + ' of ' + maxAttempts + ')...';
+        }
+        retryLinkBtn.style.display = 'none';
+
+        fetch('https://signinwithapplebackendserver.onrender.com/link-apple-token', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            device_code: deviceCode,
+            user_token: userToken
+          })
+        })
+        .then(function(response) {
+          if (response.ok) {
+            outputEl.textContent = 'Apple Music login successful!\nYou may now return to your device.';
+            return;
+          }
+          throw new Error('Backend responded with status ' + response.status);
+        })
+        .catch(function(err) {
+          if (attempt < maxAttempts) {
+            setTimeout(function() {
+              linkTokenToBackend(userToken, attempt + 1);
+            }, backoffMs[attempt - 1]);
+          } else {
+            outputEl.textContent = 'Signed in, but could not notify your device: ' + err.message;
+            retryLinkBtn.style.display = 'block';
+            retryLinkBtn.onclick = function() {
+              linkTokenToBackend(userToken, 1);
+            };
+          }
+        });
+      }
+
+      document.addEventListener('musickitloaded', function () {
+        console.log('MusicKit loaded');
+
         MusicKit.configure({
           developerToken: developerToken,
           app: {
@@ -381,55 +418,43 @@
           },
         });
         console.log('MusicKit configured');
-        
+
         const music = MusicKit.getInstance();
         console.log('MusicKit instance: ', music);
-        
-        music.authorize().then(function (userToken) {
-          console.log('Authorization successful, userToken: ', userToken);
-          
-          // POST deviceCode and userToken to your backend
-          if (deviceCode) {
-            fetch('https://signinwithapplebackendserver.onrender.com/link-apple-token', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({
-                device_code: deviceCode,
-                user_token: userToken
-              })
-            })
-            .then(function(response) {
-              if (response.ok) {
-                document.getElementById('output').textContent = 
-                  'Apple Music login successful!\nYou may now return to your device.';
-              } else {
-                document.getElementById('output').textContent = 
-                  'Login OK, but failed to notify your device.';
-              }
-            })
-            .catch(function(err) {
-              document.getElementById('output').textContent = 'Error contacting backend: ' + err;
-            });
-          } else {
-            document.getElementById('output').textContent = 'Successfully signed in!\nToken: ' + userToken;
-          }
 
-          // Show the 'Return to App' button
-          var btn = document.getElementById('returnToAppBtn');
-          btn.style.display = 'block';
-          btn.onclick = function() {
-            window.location.href = 'intent://applemusic/callback?token=' + encodeURIComponent(userToken) + '#Intent;scheme=pasa-mediaplayer;package=com.pasa.mediaplayer;end';
-            setTimeout(function() {
-              window.location.href = 'pasa-mediaplayer://applemusic/callback?token=' + encodeURIComponent(userToken);
-            }, 1000);
-          };
-        });
+        // Only start the Apple sign-in flow from a real tap - authorize()
+        // is more reliable across mobile browsers when it originates from a
+        // direct user gesture rather than firing automatically on page load.
+        signInBtn.style.display = 'block';
+        signInBtn.onclick = function () {
+          signInBtn.style.display = 'none';
+          outputEl.textContent = 'Opening Apple sign-in...';
 
-        music.authorize().catch(function (err) {
-          console.error('Authorization failed:', err);
-          document.getElementById('output').textContent =
-            'Authorization failed: ' + err;
-        });
+          music.authorize().then(function (userToken) {
+            console.log('Authorization successful, userToken: ', userToken);
+
+            if (deviceCode) {
+              linkTokenToBackend(userToken, 1);
+            } else {
+              outputEl.textContent = 'Successfully signed in!\nToken: ' + userToken;
+            }
+
+            // Show the 'Return to App' button
+            returnToAppBtn.style.display = 'block';
+            returnToAppBtn.onclick = function() {
+              window.location.href = 'intent://applemusic/callback?token=' + encodeURIComponent(userToken) + '#Intent;scheme=pasa-mediaplayer;package=com.pasa.mediaplayer;end';
+              setTimeout(function() {
+                if (!document.hidden) {
+                  window.location.href = 'pasa-mediaplayer://applemusic/callback?token=' + encodeURIComponent(userToken);
+                }
+              }, 1000);
+            };
+          }).catch(function (err) {
+            console.error('Authorization failed:', err);
+            outputEl.textContent = 'Authorization failed: ' + err;
+            signInBtn.style.display = 'block';
+          });
+        };
       });
 
       // Fallback: check if MusicKit is already loaded
