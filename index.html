@@ -475,47 +475,60 @@
           signInBtn.onclick = function () {
             signInBtn.style.display = 'none';
             outputEl.textContent = 'Opening Apple sign-in...';
-            logStep('Sign-in button tapped, calling authorize()');
+            logStep('Sign-in button tapped');
 
-            let authorizeSettled = false;
-            const authorizeWatchdog = setTimeout(function () {
-              if (authorizeSettled) return;
-              logStep('authorize() has not responded after 20s - likely a blocked pop-up or blocked cookies/storage.');
-              outputEl.textContent = 'Sign-in did not respond. This is often caused by a blocked pop-up or blocked cookies. ' +
-                'Check your browser for a blocked pop-up notification and allow it, or check that cookies are allowed, then tap Sign in again.';
-              signInBtn.style.display = 'block';
-            }, 20000);
+            // MusicKit JS caches the authorized user-token per browser/origin, so
+            // authorize() would otherwise silently resolve with whatever Apple ID
+            // last signed in on this device - no prompt, no way to notice. Clearing
+            // it first forces a fresh authorization every time this page is used.
+            Promise.resolve()
+              .then(function () { return music.unauthorize(); })
+              .catch(function (e) {
+                logStep('unauthorize() before sign-in failed (ignoring): ' + (e && e.message ? e.message : e));
+              })
+              .then(function () {
+                logStep('Calling authorize()');
 
-            let authorizePromise;
-            try {
-              authorizePromise = music.authorize();
-            } catch (e) {
-              authorizeSettled = true;
-              clearTimeout(authorizeWatchdog);
-              logStep('authorize() threw synchronously: ' + e.message);
-              outputEl.textContent = 'Sign-in failed to start: ' + e.message;
-              signInBtn.style.display = 'block';
-              return;
-            }
+                let authorizeSettled = false;
+                const authorizeWatchdog = setTimeout(function () {
+                  if (authorizeSettled) return;
+                  logStep('authorize() has not responded after 20s - likely a blocked pop-up or blocked cookies/storage.');
+                  outputEl.textContent = 'Sign-in did not respond. This is often caused by a blocked pop-up or blocked cookies. ' +
+                    'Check your browser for a blocked pop-up notification and allow it, or check that cookies are allowed, then tap Sign in again.';
+                  signInBtn.style.display = 'block';
+                }, 20000);
 
-            authorizePromise.then(function (userToken) {
-              authorizeSettled = true;
-              clearTimeout(authorizeWatchdog);
-              logStep('authorize() resolved successfully');
+                let authorizePromise;
+                try {
+                  authorizePromise = music.authorize();
+                } catch (e) {
+                  authorizeSettled = true;
+                  clearTimeout(authorizeWatchdog);
+                  logStep('authorize() threw synchronously: ' + e.message);
+                  outputEl.textContent = 'Sign-in failed to start: ' + e.message;
+                  signInBtn.style.display = 'block';
+                  return;
+                }
 
-              if (deviceCode) {
-                linkTokenToBackend(userToken, 1);
-              } else {
-                outputEl.textContent = 'Successfully signed in!\nToken: ' + userToken;
-              }
-            }).catch(function (err) {
-              authorizeSettled = true;
-              clearTimeout(authorizeWatchdog);
-              const errMsg = err && err.message ? err.message : err;
-              logStep('authorize() rejected: ' + errMsg);
-              outputEl.textContent = 'Authorization failed: ' + errMsg;
-              signInBtn.style.display = 'block';
-            });
+                authorizePromise.then(function (userToken) {
+                  authorizeSettled = true;
+                  clearTimeout(authorizeWatchdog);
+                  logStep('authorize() resolved successfully');
+
+                  if (deviceCode) {
+                    linkTokenToBackend(userToken, 1);
+                  } else {
+                    outputEl.textContent = 'Successfully signed in!\nToken: ' + userToken;
+                  }
+                }).catch(function (err) {
+                  authorizeSettled = true;
+                  clearTimeout(authorizeWatchdog);
+                  const errMsg = err && err.message ? err.message : err;
+                  logStep('authorize() rejected: ' + errMsg);
+                  outputEl.textContent = 'Authorization failed: ' + errMsg;
+                  signInBtn.style.display = 'block';
+                });
+              });
           };
         }).catch(function (e) {
           logStep('MusicKit.configure() rejected: ' + (e && e.message ? e.message : e));
